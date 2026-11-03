@@ -8,8 +8,7 @@ or offer. No proprietary-use rights are granted here. A commercial license,
 if any, requires a separate written agreement signed by the verified rights
 holder. Contact details and commercial terms have not been supplied.
 
-Commercial licensing hook: Neutral rights-holder inquiry notice; no commercial
-grant until separately signed.
+Neutral rights-holder inquiry notice; no commercial grant until separately signed
 
 Copyright attribution is listed as `thrito-solance` per the project request;
 the identity and authority of the rights holder have not been independently
