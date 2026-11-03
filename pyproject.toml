@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vita"
+version = "0.1.0"
+description = "Vectorized Intent Tracking Architecture"
+requires-python = ">=3.11"
+license = "AGPL-3.0-or-later"
+authors = [{ name = "thrito-solance" }]
+dependencies = [
+  "confluent-kafka>=2.4.0",
+  "redis>=5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-timeout>=2.3",
+]
+
+[project.scripts]
+vita = "vita.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+license-files = ["LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "integration: requires docker compose up (kafka + redis)",
+]
