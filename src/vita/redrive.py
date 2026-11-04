@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Protocol
 
 from vita.core import ContractViolation, NeuroSymbolicTensorCore
+from vita.mcda_core import InvalidScoreBoundaryError
 from vita.persistence import Backend, compute_payload_hash
 from vita.schema import validate_and_derive
 
@@ -286,6 +287,8 @@ class ReDrivePipeline:
         }
         try:
             validated = validate_and_derive(corrected_business)
+        except InvalidScoreBoundaryError as exc:
+            raise ReDriveRejected(f"schema gate: {exc.code}: {exc}") from exc
         except ContractViolation as exc:
             raise ReDriveRejected(f"schema gate: {exc.code}: {exc}") from exc
         business_hash = compute_business_hash(validated)

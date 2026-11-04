@@ -7,6 +7,12 @@ import math
 from typing import Any, Dict
 
 from vita.core import ContractViolation
+from vita.mcda_core import (
+    InvalidScoreBoundaryError,
+    beta_cdf,
+    beta_pdf,
+    normalize_score,
+)
 
 REQUIRED = (
     "user_id", "current_state", "target_state",
@@ -45,4 +51,13 @@ def validate_and_derive(raw: Dict[str, Any]) -> Dict[str, Any]:
 
     derived = dict(raw)
     derived["time_in_state"] = float(raw["event_time"]) - float(raw["state_entry_time"])
+    if "intent_score" in raw:
+        normalized = normalize_score(raw["intent_score"])
+        density = beta_pdf(raw["intent_score"])
+        percentile = beta_cdf(raw["intent_score"])
+        derived.update({
+            "intent_score_normalized": normalized,
+            "intent_score_density": density,
+            "intent_score_percentile": percentile,
+        })
     return derived

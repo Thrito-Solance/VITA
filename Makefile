@@ -13,7 +13,7 @@ logs:  ; docker compose logs -f processor
 
 test:
 	docker compose run --rm --build processor-dev \
-	  pytest -q tests/test_vita_resilience.py
+	  pytest -q tests/test_vita_resilience.py tests/test_mcda_resilience.py
 
 test-integration: up
 	docker compose run --rm processor-dev \

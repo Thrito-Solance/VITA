@@ -16,6 +16,7 @@ from confluent_kafka import Consumer, Producer, KafkaError
 from vita.core import (
     ContractViolation, IntentPayload, NeuroSymbolicTensorCore, TemporalKernel,
 )
+from vita.mcda_core import InvalidScoreBoundaryError
 from vita.persistence import (
     LedgerEntry, LedgerWriteError, TransitionLedger,
 )
@@ -156,6 +157,9 @@ class VITAStreamingProcessor:
 
         try:
             record = validate_and_derive(raw)
+        except InvalidScoreBoundaryError as exc:
+            self._quarantine_both(raw, exc.code, str(exc))
+            return
         except ContractViolation as exc:
             self._quarantine_both(raw, exc.code, str(exc))
             return

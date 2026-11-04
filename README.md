@@ -46,11 +46,18 @@ docker compose down
 ## Architecture
 
 - `src/vita/core.py` — intent metadata, validated temporal kernel, sparse transition rules
-- `src/vita/schema.py` — input validation and server-side elapsed-time derivation
+- `src/vita/mcda_core.py` — pure, bounded Beta PDF/CDF model for intent scores
+- `src/vita/schema.py` — input validation, MCDA score metadata, and server-side elapsed-time derivation
 - `src/vita/persistence.py` — Redis/in-memory backend, idempotency primitives, transition ledger
 - `src/vita/redrive.py` — quarantine records, payload integrity checks, guarded re-drive
 - `src/vita/kafka_consumer.py` — Kafka adapter; external effects are not atomic with Redis
 - `tests/` — in-memory resilience tests and opt-in integration checks
+
+When an input includes `intent_score`, it must be a finite number in `[0, 10]`.
+The schema adds `intent_score_normalized`, `intent_score_density`, and
+`intent_score_percentile`; the percentile is the CDF fraction in `[0, 1]`.
+Each derived numeric value is rounded to four decimal places before it is
+returned. Inputs without `intent_score` retain the existing schema behavior.
 
 ## Licensing
 

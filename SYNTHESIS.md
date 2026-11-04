@@ -133,6 +133,7 @@ means the target environment or product contract is missing.
 | F3: Idempotency/ledger | SUPPORTED: reservation preceded append | INFERRED: stale idempotency tombstone | SUPPORTED: reservation is not a durable event record | SUPPORTED: original consumer and Redis code | SUPPORTED: `persistence.py`; crash-injection test remains unexecuted |
 | F4: Redis ledger | SUPPORTED: claim and append were separate calls | INFERRED: atomic-script dedupe pattern | SUPPORTED: index hit could outlive missing stream record | SUPPORTED: original append sequence; memory regression executed | SUPPORTED: `persistence.py`; Redis execution remains unverified |
 | F5: Re-drive request identity | SUPPORTED: cached receipt returned before request comparison | INFERRED: idempotency keys bind request identity | SUPPORTED: ID alone did not identify payload/quarantine | SUPPORTED: source plus executed mismatch test | SUPPORTED: `redrive.py`; regression test executed |
+| MCDA-BB v3: bounded score model | SUPPORTED: schema invokes pure normalization/PDF/CDF wrappers | INFERRED: log-space density and continued-fraction incomplete Beta | SUPPORTED: scores are finite and closed-domain bounded | SUPPORTED: tagged reference values plus benchmark tests | SUPPORTED: `mcda_core.py`; `test_mcda_resilience.py` |
 
 ## 4. Recursive dependency and synthesis
 
@@ -187,10 +188,11 @@ transaction is invented.
 
 | Test / check | Status | Observation / falsifier |
 |---|---|---|
-| Offline resilience suite | **EXECUTED** | 29 passed, 9 Redis-parameterized cases skipped, 2 integration cases deselected. |
+| Offline resilience suite | **EXECUTED** | 56 passed, 9 Redis-parameterized cases skipped, 2 integration cases deselected. |
 | Python syntax compilation | **EXECUTED** | `compileall` succeeded for `src`, `tests`, and `scripts`. |
 | Project metadata parse | **EXECUTED** | `pyproject.toml` parsed successfully. |
 | Wheel packaging | **EXECUTED** | Wheel built and included `dist-info/licenses/LICENSE`. |
+| MCDA-BB v3 resilience suite | **EXECUTED** | 26 tests cover closed-domain rejection, finite edge behavior, all reference percentile examples, schema output rounding, and repeatable business hashes. |
 | Kafka/Redis integration | **PROCESSED, not executed** | Docker and the Python clients are unavailable; no claim of integration success. |
 | Kafka delivery-failure/offset test | **PROCESSED, not executed** | Must run with a broker and an injected producer delivery failure. |
 | Redis crash/partial-write test | **PROCESSED, not executed** | Must run against Redis with failures around `EVAL`/stream persistence. |
@@ -201,12 +203,22 @@ transaction is invented.
 - [LICENSE](./LICENSE) — GNU AGPL version 3 text.
 - [COMMERCIAL-LICENSING.md](./COMMERCIAL-LICENSING.md) — non-granting commercial inquiry notice.
 - [core.py](./src/vita/core.py) and [schema.py](./src/vita/schema.py) — pure decision core and fail-closed validation.
+- [mcda_core.py](./src/vita/mcda_core.py) — pure bounded-Beta score normalization, density, and CDF.
 - [persistence.py](./src/vita/persistence.py) — in-memory atomic adapter and Redis Lua ledger append.
 - [redrive.py](./src/vita/redrive.py) — quarantine, integrity/schema revalidation, request-bound receipt, and explicit uncertain outcome.
 - [kafka_consumer.py](./src/vita/kafka_consumer.py) — delivery-confirmed output before input offset commit.
 - [test_vita_resilience.py](./tests/test_vita_resilience.py) — malformed input, concurrent deduplication, quarantine, and re-drive assertions.
+- [test_mcda_resilience.py](./tests/test_mcda_resilience.py) — score boundaries, percentile benchmarks, edge stability, and hash determinism.
 - [test_integration.py](./tests/test_integration.py) — Kafka/Redis integration tests; not executed here.
 
 All generated Python modules carry `SPDX-License-Identifier: AGPL-3.0-or-later`.
 The source set is user-provided; no third-party dependency or external service
 was added beyond the dependencies already declared in the architecture notes.
+
+The MCDA-BB v3 integration pins the reference shape constants
+`alpha=10.0361`, `beta=2.5705`. It rejects invalid scores with
+`InvalidScoreBoundaryError` instead of coercing or clamping inputs. Density is
+computed in log space and the regularized incomplete Beta uses a bounded
+continued fraction; both return four-decimal values, including finite exact
+domain-edge outputs. Schema metadata remains optional when no `intent_score`
+is supplied.
